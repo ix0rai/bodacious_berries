@@ -1,5 +1,5 @@
 {
-  "replace": "false",
+  "replace": false,
   "values": [
     "minecraft:sweet_berry_bush",
     "bodacious_berries:strawberry_bush",

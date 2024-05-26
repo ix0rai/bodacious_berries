@@ -1,5 +1,6 @@
 package io.ix0rai.bodacious_berries.block;
 
+import com.mojang.serialization.MapCodec;
 import io.ix0rai.bodacious_berries.block.entity.BerryHarvesterBlockEntity;
 import io.ix0rai.bodacious_berries.registry.BodaciousBlocks;
 import net.minecraft.block.Block;
@@ -34,6 +35,12 @@ public class BerryHarvesterBlock extends BlockWithEntity {
     }
 
     @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        // todo
+        return null;
+    }
+
+    @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
@@ -62,12 +69,12 @@ public class BerryHarvesterBlock extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity entity, BlockHitResult hitResult) {
         if (!world.isClient) {
             // create screen
             NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
             if (screenHandlerFactory != null) {
-                player.openHandledScreen(screenHandlerFactory);
+                entity.openHandledScreen(screenHandlerFactory);
             }
         }
 

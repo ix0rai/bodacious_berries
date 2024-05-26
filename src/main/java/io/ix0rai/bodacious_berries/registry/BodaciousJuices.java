@@ -22,7 +22,7 @@ import static net.minecraft.world.biome.Biomes.*;
 public class BodaciousJuices {
     public static final Item JUICE_RECEPTACLE = Items.GLASS_BOTTLE;
     public static final Item.Settings JUICE_SETTINGS = new Item.Settings().recipeRemainder(JUICE_RECEPTACLE).maxCount(16);
-    public static final Juice DUBIOUS_JUICE = new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(2).saturationModifier(2F).build()));
+    public static final Juice DUBIOUS_JUICE = new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(2).saturation(2F).build()));
 
     public static void register() {
         register(BodaciousBerries.id("dubious_juice"), DUBIOUS_JUICE);
@@ -62,15 +62,15 @@ public class BodaciousJuices {
     }
 
     private static void registerBlends() {
-        register("goji_berry_blend", new GojiBerryBlend(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturationModifier(1.8F).statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 800, 1), 1.0F).build())));
-        register("opposite_juice", new Juice(new FoodComponent.Builder().hunger(4).saturationModifier(1.2F).build()));
-        register("rainberry_blend", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(6).saturationModifier(1.6F).build())));
-        register("gooseberry_rum", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(7).saturationModifier(1.0f).build())));
-        register("red_juice", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturationModifier(1.3F).build())));
-        register("end_blend", new EndBlend(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(3).saturationModifier(3.3F).build())));
-        register("purple_delight", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(6).saturationModifier(1.6F).build())));
-        register("traffic_light_juice", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturationModifier(1.4F).build())));
-        register("vanilla_delight", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(4).saturationModifier(2.0F).build())));
+        register("goji_berry_blend", new GojiBerryBlend(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturation(1.8F).statusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 800, 1), 1.0F).build())));
+        register("opposite_juice", new Juice(new FoodComponent.Builder().hunger(4).saturation(1.2F).build()));
+        register("rainberry_blend", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(6).saturation(1.6F).build())));
+        register("gooseberry_rum", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(7).saturation(1.0f).build())));
+        register("red_juice", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturation(1.3F).build())));
+        register("end_blend", new EndBlend(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(3).saturation(3.3F).build())));
+        register("purple_delight", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(6).saturation(1.6F).build())));
+        register("traffic_light_juice", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(5).saturation(1.4F).build())));
+        register("vanilla_delight", new Juice(JUICE_SETTINGS.food(new FoodComponent.Builder().hunger(4).saturation(2.0F).build())));
     }
 
     private static void register(String name, Juice juice) {

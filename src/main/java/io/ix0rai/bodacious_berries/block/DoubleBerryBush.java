@@ -16,15 +16,14 @@ import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemInteractionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.random.RandomGenerator;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
-@SuppressWarnings("deprecation")
 public class DoubleBerryBush extends TallPlantBlock implements BerryBush {
     public static final int MAX_AGE = 3;
     public static final IntProperty AGE = Properties.AGE_3;
@@ -40,7 +39,7 @@ public class DoubleBerryBush extends TallPlantBlock implements BerryBush {
     }
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return this.getBerryItem().getDefaultStack();
     }
 
@@ -57,11 +56,6 @@ public class DoubleBerryBush extends TallPlantBlock implements BerryBush {
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState state) {
-        return state.get(getAge()) < MAX_AGE;
-    }
-
-    @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, RandomGenerator random) {
         int age = state.get(getAge());
         // if the age isn't maximum and the light level is high enough grow the bush
@@ -72,12 +66,12 @@ public class DoubleBerryBush extends TallPlantBlock implements BerryBush {
 
     @Override
     public boolean isFertilizable(WorldView world, BlockPos pos, BlockState state) {
-        return hasRandomTicks(state);
+        return state.get(getAge()) < MAX_AGE;
     }
 
     @Override
     public boolean canFertilize(World world, RandomGenerator random, BlockPos pos, BlockState state) {
-        return hasRandomTicks(state);
+        return isFertilizable(world, pos, state);
     }
 
     @Override
@@ -91,13 +85,20 @@ public class DoubleBerryBush extends TallPlantBlock implements BerryBush {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if (hasRandomTicks(state) && player.getStackInHand(hand).isOf(Items.BONE_MEAL)) {
-            return ActionResult.PASS;
-        } else if (state.get(getAge()) == MAX_AGE) {
+    protected ItemInteractionResult onInteract(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity entity, Hand hand, BlockHitResult hitResult) {
+        int age = state.get(AGE);
+        boolean isMaxAge = age == MAX_AGE;
+        return !isMaxAge && stack.isOf(Items.BONE_MEAL)
+                ? ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION
+                : super.onInteract(stack, state, world, pos, entity, hand, hitResult);
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
+        if (state.get(getAge()) == MAX_AGE) {
             return BasicBerryBush.pickBerries(pos, world, state, this.getBerryItem());
         } else {
-            return super.onUse(state, world, pos, player, hand, hit);
+            return super.onUse(state, world, pos, player, hitResult);
         }
     }
 

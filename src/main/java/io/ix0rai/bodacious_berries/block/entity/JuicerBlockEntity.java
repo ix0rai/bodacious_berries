@@ -18,6 +18,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeHolder;
+import net.minecraft.registry.HolderLookup;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
@@ -66,14 +67,13 @@ public class JuicerBlockEntity extends BlockEntity implements ImplementedInvento
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        Inventories.readNbt(nbt, inventory);
+    public void method_11014(NbtCompound nbt, HolderLookup.Provider lookupProvider) {
+        Inventories.readNbt(nbt, inventory, lookupProvider);
     }
 
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        Inventories.writeNbt(nbt, inventory);
+    public void writeNbt(NbtCompound nbt, HolderLookup.Provider lookupProvider) {
+        Inventories.writeNbt(nbt, inventory, lookupProvider);
     }
 
     @Override

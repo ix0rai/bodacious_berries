@@ -4,17 +4,19 @@ import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.ix0rai.bodacious_berries.BodaciousBerries;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeHolder;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.HolderLookup;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.collection.DefaultedList;
@@ -77,8 +79,8 @@ public record JuicerRecipe(Ingredient ingredient0, Ingredient ingredient1, Ingre
     }
 
     @Override
-    public ItemStack craft(Inventory inventory, DynamicRegistryManager registryManager) {
-        return getResult(registryManager).copy();
+    public ItemStack craft(Inventory inventory, HolderLookup.Provider provider) {
+        return getResult(provider).copy();
     }
 
     @Override
@@ -87,7 +89,7 @@ public record JuicerRecipe(Ingredient ingredient0, Ingredient ingredient1, Ingre
     }
 
     @Override
-    public ItemStack getResult(DynamicRegistryManager registryManager) {
+    public ItemStack getResult(HolderLookup.Provider provider) {
         return this.result;
     }
 
@@ -162,15 +164,15 @@ public record JuicerRecipe(Ingredient ingredient0, Ingredient ingredient1, Ingre
      */
     public record IngredientSet(Ingredient ingredient0, Ingredient ingredient1, Ingredient ingredient2, Ingredient receptacle) {
         private static final Codec<IngredientSet> ALL_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-                Ingredient.field_46095.fieldOf("all").forGetter((set) -> set.ingredient0),
-                Ingredient.field_46095.fieldOf("receptacle").forGetter((set) -> set.receptacle)
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("all").forGetter((set) -> set.ingredient0),
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("receptacle").forGetter((set) -> set.receptacle)
         ).apply(instance, (ingredient, receptacle) -> new IngredientSet(ingredient, ingredient, ingredient, receptacle)));
 
         private static final Codec<IngredientSet> INDIVIDUAL_CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-                Ingredient.field_46095.fieldOf("0").forGetter((set) -> set.ingredient0),
-                Ingredient.field_46095.fieldOf("1").forGetter((set) -> set.ingredient1),
-                Ingredient.field_46095.fieldOf("2").forGetter((set) -> set.ingredient2),
-                Ingredient.field_46095.fieldOf("receptacle").forGetter((set) -> set.receptacle)
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("0").forGetter((set) -> set.ingredient0),
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("1").forGetter((set) -> set.ingredient1),
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("2").forGetter((set) -> set.ingredient2),
+                Ingredient.DISALLOW_EMPTY_CODEC.fieldOf("receptacle").forGetter((set) -> set.receptacle)
         ).apply(instance, IngredientSet::new));
 
         private static final Codec<Either<IngredientSet, IngredientSet>> EITHER_CODEC = Codec.either(
@@ -194,32 +196,53 @@ public record JuicerRecipe(Ingredient ingredient0, Ingredient ingredient1, Ingre
     }
 
     public static class Serializer implements RecipeSerializer<JuicerRecipe> {
-        private static final Codec<JuicerRecipe> CODEC = RecordCodecBuilder.create((instance) -> instance.group(
-                IngredientSet.CODEC.fieldOf("ingredients").forGetter((recipe) -> new IngredientSet(recipe.ingredient0, recipe.ingredient1, recipe.ingredient2, recipe.receptacle)),
-                Registries.ITEM.getCodec().xmap(ItemStack::new, ItemStack::getItem).fieldOf("result").forGetter((recipe) -> recipe.result)
+        private static final MapCodec<JuicerRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
+                IngredientSet.CODEC.fieldOf("ingredients").forGetter((recipe) -> {
+                    if (recipe instanceof JuicerRecipe juicerRecipe) {
+                        return new IngredientSet(juicerRecipe.ingredient0, juicerRecipe.ingredient1, juicerRecipe.ingredient2, juicerRecipe.receptacle);
+                    } else {
+                        throw new RuntimeException("recipe error");
+                    }
+                }),
+                Registries.ITEM.getCodec().xmap(ItemStack::new, ItemStack::getItem).fieldOf("result").forGetter((recipe) -> {
+                    if (recipe instanceof JuicerRecipe juicerRecipe) {
+                        return juicerRecipe.result;
+                    } else {
+                        throw new RuntimeException("recipe error");
+                    }
+                })
         ).apply(instance, (set, result) -> new JuicerRecipe(set.ingredient0(), set.ingredient1(), set.ingredient2(), set.receptacle(), result)));
+        private final PacketCodec<RegistryByteBuf, JuicerRecipe> packetCodec;
 
-        @Override
-        public JuicerRecipe read(PacketByteBuf buf) {
-            Ingredient input1 = Ingredient.fromPacket(buf);
-            Ingredient input2 = Ingredient.fromPacket(buf);
-            Ingredient input3 = Ingredient.fromPacket(buf);
-            Ingredient receptacle = Ingredient.fromPacket(buf);
-            return new JuicerRecipe(input1, input2, input3, receptacle, buf.readItemStack());
+		public Serializer() {
+			packetCodec = PacketCodec.create(this::write, this::read);
+		}
+
+        public JuicerRecipe read(RegistryByteBuf buf) {
+            Ingredient input1 = Ingredient.PACKET_CODEC.decode(buf);
+            Ingredient input2 = Ingredient.PACKET_CODEC.decode(buf);
+            Ingredient input3 = Ingredient.PACKET_CODEC.decode(buf);
+            Ingredient receptacle = Ingredient.PACKET_CODEC.decode(buf);
+            ItemStack result = ItemStack.PACKET_CODEC.decode(buf);
+            return new JuicerRecipe(input1, input2, input3, receptacle, result);
+        }
+
+        public void write(RegistryByteBuf packetData, JuicerRecipe recipe) {
+            Ingredient.PACKET_CODEC.encode(packetData, recipe.ingredient0());
+            Ingredient.PACKET_CODEC.encode(packetData, recipe.ingredient1());
+            Ingredient.PACKET_CODEC.encode(packetData, recipe.ingredient2());
+            Ingredient.PACKET_CODEC.encode(packetData, recipe.receptacle());
+            ItemStack.PACKET_CODEC.encode(packetData, recipe.getResult());
         }
 
         @Override
-        public Codec<JuicerRecipe> method_53736() {
+        public MapCodec<JuicerRecipe> getCodec() {
             return CODEC;
         }
 
         @Override
-        public void write(PacketByteBuf packetData, JuicerRecipe recipe) {
-            recipe.ingredient0().write(packetData);
-            recipe.ingredient1().write(packetData);
-            recipe.ingredient2().write(packetData);
-            recipe.receptacle().write(packetData);
-            packetData.writeItemStack(recipe.getResult());
+        public PacketCodec<RegistryByteBuf, JuicerRecipe> getPacketCodec() {
+            return packetCodec;
         }
     }
 }

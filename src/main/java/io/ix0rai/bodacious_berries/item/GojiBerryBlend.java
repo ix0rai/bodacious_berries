@@ -20,7 +20,7 @@ public class GojiBerryBlend extends Juice {
             Iterator<StatusEffectInstance> iterator = user.getStatusEffects().iterator();
             do {
                 StatusEffectInstance instance = iterator.next();
-                if (instance.getEffectType().getType().equals(StatusEffectType.HARMFUL)) {
+                if (instance.getEffectType().value().getType().equals(StatusEffectType.HARMFUL)) {
                     user.removeStatusEffect(instance.getEffectType());
                 }
             } while (iterator.hasNext());

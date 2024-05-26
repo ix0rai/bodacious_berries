@@ -1,0 +1,26 @@
+{
+  "replace": false,
+  "values": [
+    "#c:foods/sweet_berries",
+    "#c:foods/glow_berries",
+    "#c:foods/saskatoon_berries",
+    "#c:foods/raspberries",
+    "#c:foods/strawberries",
+    "#c:foods/blackberries",
+    "#c:foods/chorus_berries",
+    "#c:foods/rainberries",
+    "#c:foods/lingonberries",
+    "#c:foods/grapes",
+    "#c:foods/goji_berries",
+    "#c:foods/gooseberries",
+    "#c:foods/cloudberries",
+    "#c:foods/blueberries",
+    "#c:foods/elderberries",
+    "#c:foods/salmonberries",
+    "#c:foods/yellow_berries",
+    "#c:foods/green_berries",
+    "#c:foods/purple_berries",
+    "#c:foods/orange_berries",
+    "#c:foods/green_berries"
+  ]
+}

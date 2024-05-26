@@ -1,5 +1,5 @@
 plugins {
-    id "fabric-loom" version "1.2.4"
+    id "fabric-loom" version "1.6.+"
     id "io.github.juuxel.loom-quiltflower" version "1.10.0"
     id "com.github.johnrengelman.shadow" version "7.1.2"
     id "java-library"
@@ -10,6 +10,14 @@ int javaVersion = Integer.parseInt(project.java_version)
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
+
+loom {
+    runs {
+        client {
+            vmArgs "-Dfabric-tag-conventions-v1.legacyTagWarning=DEV_VERBOSE"
+        }
+    }
+}
 
 repositories {
     maven { url = "https://maven.gegy.dev/" }
@@ -39,7 +47,6 @@ dependencies {
     // dependencies for config
     shadow("com.electronwill.night-config:core:${project.night_config_version}")
     shadow("com.electronwill.night-config:toml:${project.night_config_version}")
-    include(modImplementation("dev.lambdaurora:spruceui:${project.spruceui_version}"))
     modImplementation("com.terraformersmc:modmenu:${project.mod_menu_version}") { transitive = false }
 
     // fabric api

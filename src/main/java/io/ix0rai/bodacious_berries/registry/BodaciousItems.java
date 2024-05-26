@@ -26,12 +26,12 @@ public class BodaciousItems {
     public static final AliasedBlockItem RASPBERRIES = new AliasedBlockItem(BodaciousBushes.RASPBERRY_BUSH, settings(3, 0.5f));
     public static final AliasedBlockItem BLACKBERRIES = new AliasedBlockItem(BodaciousBushes.BLACKBERRY_BUSH, settings(1, 1.5f));
     public static final AliasedBlockItem CHORUS_BERRIES = new ChorusBerries(BodaciousBushes.CHORUS_BERRY_BUSH, settings(2, 1.6f));
-    public static final AliasedBlockItem RAINBERRIES = new Rainberries(BodaciousBushes.RAINBERRY_BUSH, new Item.Settings());
+    public static final AliasedBlockItem RAINBERRIES = new Rainberries(BodaciousBushes.RAINBERRY_BUSH, settings(3, 1.0f));
     public static final AliasedBlockItem LINGONBERRIES = new AliasedBlockItem(BodaciousBushes.LINGONBERRY_BUSH, settings(2, 0.5f));
     public static final AliasedBlockItem GRAPES = new AliasedBlockItem(BodaciousBushes.GRAPEVINE, settings(2, 1f));
     public static final AliasedBlockItem GOJI_BERRIES = new GojiBerries(BodaciousBushes.GOJI_BERRY_BUSH, settings(1, 2.2f));
     public static final AliasedBlockItem GOOSEBERRIES = new AliasedBlockItem(BodaciousBushes.GOOSEBERRY_BUSH, settings(2, 0.5f));
-    public static final AliasedBlockItem CLOUDBERRIES = new AliasedBlockItem(BodaciousBushes.CLOUDBERRY_BUSH, new Item.Settings().food(new FoodComponent.Builder().hunger(2).saturationModifier(1f).statusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 600, 1), 1).snack().build()));
+    public static final AliasedBlockItem CLOUDBERRIES = new AliasedBlockItem(BodaciousBushes.CLOUDBERRY_BUSH, new Item.Settings().food(new FoodComponent.Builder().hunger(2).saturation(1f).statusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 600, 1), 1).snack().build()));
 
     public static void register() {
         register(SASKATOON_BERRIES, Berry.SASKATOON_BERRIES);
@@ -62,6 +62,6 @@ public class BodaciousItems {
     }
 
     private static Item.Settings settings(int hunger, float saturation) {
-        return new Item.Settings().food(new FoodComponent.Builder().hunger(hunger).saturationModifier(saturation).snack().build());
+        return new Item.Settings().food(new FoodComponent.Builder().hunger(hunger).saturation(saturation).snack().build());
     }
 }

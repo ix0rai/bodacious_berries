@@ -9,7 +9,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.random.RandomGenerator;
@@ -31,11 +30,6 @@ public class CloudberryBush extends BasicBerryBush.ThreeStageBush {
     }
 
     @Override
-    public boolean hasRandomTicks(BlockState state) {
-        return true;
-    }
-
-    @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, RandomGenerator random) {
         if (Boolean.TRUE.equals(state.get(DYING))) {
             int age = state.get(getAge());
@@ -52,9 +46,9 @@ public class CloudberryBush extends BasicBerryBush.ThreeStageBush {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity entity, BlockHitResult hitResult) {
         if (Boolean.FALSE.equals(state.get(DYING))) {
-            super.onUse(state, world, pos, player, hand, hit);
+            super.onUse(state, world, pos, entity, hitResult);
         }
 
         return ActionResult.FAIL;

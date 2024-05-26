@@ -14,7 +14,6 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class Rainberries extends AliasedBlockItem {
-    private final FoodComponent foodComponent = new FoodComponent.Builder().hunger(3).saturationModifier(1.0F).build();
     public Rainberries(Block block, Settings settings) {
         super(block, settings);
     }
@@ -33,10 +32,5 @@ public class Rainberries extends AliasedBlockItem {
         user.playSound(SoundEvents.BLOCK_AMETHYST_CLUSTER_HIT, SoundCategory.PLAYERS, 0.75F, 0.4F / (user.getRandom().nextFloat() * 0.4F + 0.8F));
 
         return TypedActionResult.success(stack);
-    }
-
-    @Override
-    public FoodComponent getFoodComponent() {
-        return foodComponent;
     }
 }

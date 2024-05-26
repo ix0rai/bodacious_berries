@@ -1,5 +1,6 @@
 package io.ix0rai.bodacious_berries.block;
 
+import com.mojang.serialization.MapCodec;
 import io.ix0rai.bodacious_berries.block.entity.JuicerBlockEntity;
 import io.ix0rai.bodacious_berries.registry.BodaciousBlocks;
 import net.minecraft.block.Block;
@@ -14,18 +15,23 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-@SuppressWarnings("deprecation")
 public class JuicerBlock extends BlockWithEntity {
     public static final BooleanProperty RUNNING = BooleanProperty.of("running");
+    public static final MapCodec<JuicerBlock> CODEC = createCodec(JuicerBlock::new);
+
     public JuicerBlock(Settings settings) {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(RUNNING, false));
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     @Override
@@ -44,7 +50,7 @@ public class JuicerBlock extends BlockWithEntity {
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hitResult) {
         if (!world.isClient) {
             // create screen
             NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
